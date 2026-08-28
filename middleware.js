@@ -4,6 +4,13 @@ import { createServerClient } from '@supabase/ssr';
 export async function middleware(request) {
   let response = NextResponse.next({ request });
 
+  const pathname = request.nextUrl.pathname;
+
+  // Allow the oauth callback to complete without redirecting to login.
+  if (pathname === '/auth/callback') {
+    return response;
+  }
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
@@ -21,16 +28,15 @@ export async function middleware(request) {
     }
   );
 
-  const { pathname } = request.nextUrl;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (pathname.startsWith('/admin') && !user) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  return NextResponse.next();
+  return response;
 }
 
 export const config = {
-  matcher: ['/admin/:path*'],
+  matcher: ['/admin/:path*', '/auth/callback'],
 };

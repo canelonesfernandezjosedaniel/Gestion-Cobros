@@ -45,9 +45,16 @@ if (error) throw error
 const loginEmail = login
 
 const loginGoogle = async () => {
+const redirectTo = `${window.location.origin}/auth/callback`
 const { data, error } = await supabase.auth.signInWithOAuth({
 provider: 'google',
-options: { redirectTo: window.location.origin },
+options: {
+redirectTo,
+queryParams: {
+access_type: 'offline',
+prompt: 'consent',
+},
+},
 })
 if (error) throw error
 return data
