@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
+import { createServerClient } from "@supabase/ssr";
+import { NextResponse } from "next/server";
 
 export async function middleware(request) {
   let response = NextResponse.next({ request });
@@ -7,7 +7,7 @@ export async function middleware(request) {
   const pathname = request.nextUrl.pathname;
 
   // Allow the oauth callback to complete without redirecting to login.
-  if (pathname === '/auth/callback') {
+  if (pathname === "/auth/callback") {
     return response;
   }
 
@@ -20,23 +20,29 @@ export async function middleware(request) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value),
+          );
           response = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options),
+          );
         },
       },
-    }
+    },
   );
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (pathname.startsWith('/admin') && !user) {
-    return NextResponse.redirect(new URL('/login', request.url));
+  if (pathname.startsWith("/admin") && !user) {
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   return response;
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/auth/callback'],
+  matcher: ["/admin/:path*", "/auth/callback"],
 };

@@ -1,10 +1,10 @@
-import { NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
+import { createServerClient } from "@supabase/ssr";
+import { NextResponse } from "next/server";
 
 export async function GET(request) {
   const { searchParams, origin } = new URL(request.url);
-  const code = searchParams.get('code');
-  const next = searchParams.get('next') ?? '/admin/dashboard';
+  const code = searchParams.get("code");
+  const next = searchParams.get("next") ?? "/admin/dashboard";
 
   if (code) {
     const response = NextResponse.redirect(`${origin}${next}`);
@@ -19,11 +19,11 @@ export async function GET(request) {
           },
           setAll(cookiesToSet) {
             cookiesToSet.forEach(({ name, value, options }) =>
-              response.cookies.set(name, value, options)
+              response.cookies.set(name, value, options),
             );
           },
         },
-      }
+      },
     );
 
     const { error } = await supabase.auth.exchangeCodeForSession(code);
