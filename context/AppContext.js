@@ -2,6 +2,7 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { loadVentas, fbGetAll, fbSet, fbAdd, fbUpdate, fbDelete, loadAppConfig } from '@/lib/db';
 import { getClientStats } from '@/lib/utils';
+import { useAuth } from './AuthContext';
 
 const AppContext = createContext(null);
 
@@ -13,6 +14,7 @@ Tu saldo pendiente es de *{pendiente_usd}*
 ¡Gracias por tu preferencia! 😊`;
 
 export function AppProvider({ children }) {
+   const { user, loading: authLoading } = useAuth();
   const [records, setRecords] = useState([]);
   const [payments, setPayments] = useState([]);
   const [productCatalog, setProductCatalog] = useState({});
@@ -25,10 +27,13 @@ export function AppProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [dbStatus, setDbStatus] = useState('connecting'); // 'connected' | 'offline' | 'error'
 
-  useEffect(() => {
-    loadAllData();
-    fetchRate();
-  }, []);
+
+
+useEffect(() => {
+  if (!user) return;
+  loadAllData();
+  fetchRate();
+}, [user]);
 
   const loadAllData = async () => {
     setLoading(true);
@@ -184,6 +189,7 @@ export function AppProvider({ children }) {
 
   return (
     <AppContext.Provider value={{
+      user,
       records, setRecords,
       payments, setPayments,
       productCatalog, saveProductCatalog,
